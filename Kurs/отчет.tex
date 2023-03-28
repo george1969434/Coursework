@@ -1,0 +1,286 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[russian]{babel}
+\usepackage[oglav,spisok,boldsect,eqwhole,figwhole,hyperref,hyperprint,remarks,greekit]{./fn2kursstyle}
+\graphicspath{{./style/}{./figures/}}
+\usepackage{multirow}
+\usepackage{supertabular}
+\usepackage{multicol}
+\usepackage{amsmath}
+
+\usepackage{multirow}
+\usepackage{supertabular}
+\usepackage{multicol}
+\usepackage{subcaption}
+\usepackage{floatrow}
+\usepackage{geometry}
+\geometry{
+top=45mm}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\parskip 1ex
+% Переопределение команды \vec, чтобы векторы печатались полужирным курсивом
+%\renewcommand{\vec}[1]{\text{\mathversion{bold}${#1}$}}%{\bi{#1}}
+\newcommand\thh[1]{\text{\mathversion{bold}${#1}$}}
+%Переопределение команды нумерации перечней: точки заменяются на скобки
+\renewcommand{\labelenumi}{\theenumi)}
+% Параметры титульного листа
+\title{Исследование модели изгибно-крутильного флаттера моста при 
+	помощи пакета Wolfram Mathematica}
+\author{Е.\,Ю.~Сухова}
+\supervisor{И.\,С.~Казей}
+\group{ФН2-51Б}
+\date{2022}
+
+\begin{document}
+	\tableofcontents
+	\newpage
+\section{Введение}
+
+Основным процессом, позволяющим использовать макросвойства и макромодели для материалов, обладающих сложной микроструктурой, является процесс гомогенизации –-- замены неоднородного материала с известной микроструктурой на однородную среду, реагирующую на механические воздействия эквивалентно неоднородному материалу. Основным понятием является понятие \textit{репрезентативного элементарного объема} (РЭО) –-- характерного объема исследуемого материала, верно отражающего микроструктуру, поведение которого неотличимо от поведения материала в целом, и который при этом на макроуровне можно рассматривать как материальную точку. Величины, ассоциированные с характеристиками РЭО как точки эквивалентного однородного материала (макро-характеристики), будем обозначать с верхней чертой ($\overline{x}$ –-- радиус-вектор точки, $\overline{\sigma}$ и $\overline{\varepsilon}$ – тензоры напряжений и деформаций, осредненные по объему), тогда как величины, ассоциированные с характеристиками точки РОЭ, –-- без черты (микро-характеристики) (Рис. 1)
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=9.7cm]{n1}
+	\end{center}
+	\caption{Схема РЭО}
+\end{figure}
+
+Для упругого однородного материала справедлив обобщенный закон Гука
+\begin{equation}\label{1}
+\overline{\sigma}_{ij}=\overline{C}_{ijkl} \overline{\varepsilon}_{ij},\;\;\overline{\varepsilon}_{ij}=\overline{D}_{ijkl} \overline{\sigma}_{ij}, 
+ \end{equation}
+где $\overline{C}_{ijkl}$ --- компоненты тензора упругости $\overline{C}$; $\overline{D}_{ijkl}$ --- компоненты тензора упругой податливости $\overline{D}$. В Тензорные соотношения (\ref{1}), пользуясь свойствами симметрии тензоров  и  и теоремой о взаимности работ, удобно представлять в матричной форме ($\overline{C}_{ijkl}\rightarrow\overline{C}_{pq}, 11\rightarrow1, 22\rightarrow 2,33\rightarrow 3,23\rightarrow 4, 13\rightarrow 5, 12\rightarrow 6$).
+
+\[
+\begin{bmatrix}
+		\overline{C}
+\end{bmatrix}=
+\begin{bmatrix}
+	\overline{C}_{11}& \overline{C}_{12}& \overline{C}_{13}& \overline{C}_{14}& \overline{C}_{15}& \overline{C}_{16}\\
+	\overline{C}_{21}& \overline{C}_{22}& \overline{C}_{23}& \overline{C}_{24}& \overline{C}_{25}& \overline{C}_{26}\\
+	\overline{C}_{31}& \overline{C}_{32}& \overline{C}_{33}& \overline{C}_{34}& \overline{C}_{35}& \overline{C}_{36}\\
+	\overline{C}_{41}& \overline{C}_{42}& \overline{C}_{43}& \overline{C}_{44}& \overline{C}_{45}& \overline{C}_{46}\\
+	\overline{C}_{51}& \overline{C}_{52}& \overline{C}_{53}& \overline{C}_{54}& \overline{C}_{55}& \overline{C}_{56}\\
+	\overline{C}_{61}& \overline{C}_{62}& \overline{C}_{63}& \overline{C}_{64}& \overline{C}_{65}& \overline{C}_{66}
+\end{bmatrix},
+\begin{bmatrix}
+	\overline{D}
+\end{bmatrix}=\begin{bmatrix}
+\overline{C}
+\end{bmatrix}^{-1}.
+\]
+
+В общем случае анизотропного материала матрица упругости $\begin{bmatrix} \overline{C}
+\end{bmatrix}$ симметрична относительно своей главной диагонали и имеет 21 независимую компоненту.
+
+Если в анизотропном теле его упругие свойства идентичны в любых двух направлениях, симметричных относительно некоторой плоскости, то такая плоскость называется плоскостью упругой симметрии. Плоскость, в которой упругие свойства во всех направлениях идентичны, называют плоскостью изотропии.
+
+В связи с периодической микроструктурой и изотропией материалов фаз ККМ, как правило, обладает плоскостями упругой симметрии и/или плоскостями изотропии. Можно выделить ортотропные, трансверсально-изотропные и изотропные ККМ. 
+
+Матрица упругости трансверсально-изотропного материала имеет вид
+
+\[
+\begin{bmatrix}
+	\overline{C}
+\end{bmatrix}=
+\begin{bmatrix}
+	\overline{C}_{11}& \overline{C}_{12}& \overline{C}_{13}& \overline{C}_{14}& \overline{C}_{15}& \overline{C}_{16}\\
+	\overline{C}_{21}& \overline{C}_{22}& \overline{C}_{23}& \overline{C}_{24}& \overline{C}_{25}& \overline{C}_{26}\\
+	\overline{C}_{31}& \overline{C}_{32}& \overline{C}_{33}& \overline{C}_{34}& \overline{C}_{35}& \overline{C}_{36}\\
+	\overline{C}_{41}& \overline{C}_{42}& \overline{C}_{43}& \overline{C}_{44}& \overline{C}_{45}& \overline{C}_{46}\\
+	\overline{C}_{51}& \overline{C}_{52}& \overline{C}_{53}& \overline{C}_{54}& \overline{C}_{55}& \overline{C}_{56}\\
+	\overline{C}_{61}& \overline{C}_{62}& \overline{C}_{63}& \overline{C}_{64}& \overline{C}_{65}& \overline{C}_{66}
+\end{bmatrix},
+\begin{bmatrix}
+	\]
+
+\newpage
+\section{Постановка задачи}
+
+
+	В рамках курсовой работы покажем, как можно проектировать композиционные материалы на примере изотропных и трансверсально-изотропных материалов, используя програмный комплекс Digimat. Помимо этого, реализуем методы Mori-Tanaka и Self-consistent средствами Wolfram Mathematica. Проведем сравнительный анализ результатов двух программ.
+\newpage
+
+\section{Подходы к изучению материалов}
+Джоном Эшелби были получено аналитическое выражение для распределения деформаций в бесконечной упругой среде, вызванных произвольным включением эллипсоидной формы (рисунок 2).
+Рассмотрим бесконечное упругое тело  c эллипсоидным включением $\Omega$, упругие свойства которых определяются тензором упругости . Во включении $\Omega$ возникают собственные деформации  (рисунок 2, а)
+	\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=7.1cm]{однор}
+		\caption{}	
+		\label{fig:sub1}
+	\end{subfigure}%	
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=7cm]{неоднор}
+		\caption{}
+		\label{fig:sub2}
+	\end{subfigure}
+	\caption{ Задача Эшелби}
+\end{figure}
+
+Джон Эшелби показал, что полные деформации $\varepsilon_{ij}$ бесконечной упругой среды в этом случае задаются выражением 
+\begin{equation}
+	\varepsilon_{ij}=const=S_{ijkl}\varepsilon_{kl}^{*},
+	\label{n2}
+\end{equation}
+где  $S_{ijkl}$ –-- тензор Эшелби, зависящий от геометрии включения и компонент тензора $C_{ijkl}'$. Если рассмотреть неоднородное включение, то есть включение, обладающее отличным от $C_{ijkl}'$ тензором упругости $C_{ijkl}^{r}$ (рисунок 11, б), используя (\ref{n2}) можно получить
+
+\begin{equation}
+	\varepsilon_{ij}=const=T_{ijkl}^{r}\varepsilon_{kl}^{'},
+	\label{n3}
+\end{equation}
+где $\varepsilon_{ij}'$ --- деформации, возникающие вдали от включения, тензор $T^{r}$ называется тензором взаимодействия, а его компоненты определяются по формуле
+\begin{equation}
+	[T^r]=([I]+[S^r][C']^{-1}([C^r]-[C']))^{-1},
+	\label{n4}
+\end{equation}
+где $[X]$ обозначает матрицу 6х6, соответствующую тензору 4 ранга с компонентами $X_{ijkl}, S_{ijkl}^r=S_{ijkl}$.
+
+Существует ряд подходов, использующих соотношение (\ref{n4}) для определения компонент тензоров концентрации: Mori-Tanaka, Self-consistent. В совокупности с соотношениями для  для случаев разной геометрии включений эти подходы позволяют определить упругие свойства композита.
+
+\subsection{Подход Mori-Tanaka}
+Для метода Mori-Tanaka основное допущение состоит в том, что для произвольного включения с тензором упругости $C_{ijkl}^r$ влияние других неоднородностей передаются только через материал окружающей его матрицы с тензором упругости $C_{ijkl}^0$, НДС которого характеризуется тензорами напряжений и деформаций $\sigma_{ij}^0$ и $\varepsilon_{ij}^0$. Кроме того, предполагается, что удаление одного включения и замена его материалом матрицы существенно не влияет на НДС всего композита. Тогда можно положить $C_{ijkl}'=C_{ijkl}^0$ и $\varepsilon_{ij}'=\varepsilon_{ij}^0$, а (\ref{n3}) с учетом $\varepsilon_{ij}'=\varepsilon_{ij}^r$ преобразуется к виду 
+\begin{equation}
+	\varepsilon_{ij}^r=T_{ijkl}^r \varepsilon_{ij}^0, \; r=1..N,
+	\label{n5}
+\end{equation}
+
+Матрица $[A^r]$ соответствующая тензору концетрации $A_{ijkl}$ для данного метода получается
+\begin{equation}
+	[A^r]=[T^r](v^0[I]+\sum_{r=1}^{N}v^r[T^r])^{-1},
+	\label{n6}
+\end{equation}
+где $[I]$ --- единичная матрица 6x6, а $v^0 и v^r$ --- коэффициент Пуассона для матрицы и коэффициент Пуассона для r-ого включения соответственно.
+\newpage
+\subsection{Подход Self-consistent}
+Этот подход также исходит из предположения о том, что удаление одного включения и замена его материалом матрицы существенно не влияет на НДС композита. При этом в отличие от модели Mori-Tanaka предлагается производить учет влияния всех неоднородностей на произвольное включение, полагая $C_{ijkl}'=\overline{C}_{ijkl}$  и $\varepsilon_{ij}'=\overline{\varepsilon}_{ij}$. Тогда с учетом $\varepsilon_{ij}=\varepsilon_{ij}^r$ (\ref{n3}) можно представить в виде
+\begin{equation}
+	\varepsilon_{ij}^r=T_{ijkl}^r \overline{\varepsilon}_{ij}, \; r=1..N,
+	\label{n7}
+\end{equation}
+
+Матрица $[A^r]$ соответствующая тензору концетрации $A_{ijkl}$ для метода Self-consistent получается
+\begin{equation}
+	[A^r]=([I]+[ \overline{S^r} ][\overline{D}]([C^r]-[\overline{C}]))^{-1},
+	\label{n6}
+\end{equation}
+где $\overline{S}_{ijkl}^r$ --- компаненты тензора Эшелби, зависящие от геометрии включений r-ой фазы и компанент тензора упругости $\overline{C}_{ijkl}$.
+ 
+ Матрицу $[A^r]$ можно найти итерационными методами. В качестве начального приближения для $\overline{C}_{ijkl}$ можно выбрать упругий тензор, полученный методом Mori-Tanaka.
+ 
+
+\newpage
+\section{Результаты работы}
+\begin{enumerate}
+	\item Случай эллипсоидных изотропных включений  для метода Mori-Tanaka. Исходные данные: $ E_{matr} = 3\cdot10^9\,$Па$,\, \nu_{matr} = 0.3,\, E_{inclusion} = 55\cdot10^9\,$Па, $\, \nu_{inclusion} = 0.2$.
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=12cm]{1E11}
+		
+		\caption{Зависимость модуля упругости $E_{11}$ трансверсально-изотропного композита, армированного эллипсоидными включениями (для трех разных соотношений осей эллипсоидов) от объемной доли включения}
+	\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=12cm]{1E22}
+	
+	\caption{Зависимость модуля упругости $E_{22}$ трансверсально-изотропного композита, армированного эллипсоидными включениями (для трех разных соотношений осей эллипсоидов) от объемной доли включения}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=9.4cm]{1v23}
+	
+	\caption{ Зависимость коэффициента Пуассона $\nu_{23}$ трансверсально-изотропного композита, армированного эллипсоидными включениями (для трех разных соотношений осей эллипсоидов) от объемной доли включения}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=9.4cm]{1v12}
+	
+	\caption{Зависимость коэффициента Пуассона $\nu_{12}$ трансверсально-изотропного композита, армированного эллипсоидными включениями (для трех разных соотношений осей эллипсоидов) от объемной доли включения}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=9.4cm]{1G12}
+	
+	\caption{ Зависимость модуля сдвига $G_{12}$ трансверсально-изотропного композита, армированного эллипсоидными включениями (для трех разных соотношений осей эллипсоидов) от объемной доли включения}
+\end{figure}
+	
+	\clearpage
+	
+	
+	\item Случай трансверсально-изотропных эллипсоидных включений для метода Mori-Tanaka. Исходные данные: $E_{matr} = 3\cdot10^9\,$Па$,\, \nu_{matr} = 0.3,\,E_{11}=7.4826\cdot10^9\,$Па,$\,E_{22}=4.9984\cdot10^9\,$Па, $\nu_{23}=0.323,\,\nu_{12}=0.29,\, G_{12}=2.078\cdot10^9\,$Па.
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=12cm]{2E11}
+		
+		\caption{Зависимость модуля упругости $E_{11}$ трансверсально-изотропного композита, армированного эллипсоидными (соотношение осей 1:3) трансверсально-изотропными включениями от объемной доли включения}
+	\end{figure}
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=12cm]{2E22}
+		
+		\caption{Зависимость модуля упругости $E_{22}$ трансверсально-изотропного композита, армированного эллипсоидными (соотношение осей 1:3) трансверсально-изотропными включениями от объемной доли включения}
+	\end{figure}
+	
+	\newpage
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=9.4cm]{2v23}
+		\caption{Зависимость коэффициента Пуассона $\nu_{23}$ трансверсально-изотропного композита, армированного эллипсоидными (соотношение осей 1:3) трансверсально-изотропными включениями от объемной доли включения}
+	\end{figure}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=9.4cm]{2v12}
+		\caption{Зависимость коэффициента Пуассона $\nu_{12}$ трансверсально-изотропного композита, армированного эллипсоидными (соотношение осей 1:3) трансверсально-изотропными включениями от объемной доли включения}
+	\end{figure}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=9.4cm]{2G12}
+		
+		\caption{ Зависимость модуля сдвига $G{12}$ трансверсально-изотропного композита, армированного эллипсоидными (соотношение осей 1:3) трансверсально-изотропными включениями от объемной доли включения}
+	\end{figure}
+
+\clearpage
+	
+	\item Сравнения методов Mori-Tanaka и Self-consistent для случая сферических изотропных включений. Исходные данные: $ E_{matr} = 3\cdot10^9\,$Па$,\, \nu_{matr} = 0.3\,,\, E_{inclusion} = 55\cdot10^9\,$Па, $\, \nu_{inclusion} = 0.2$.
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=14cm]{E}
+		
+		\caption{Зависимость модуля упругости $E$ изотропного композита от объемной доли включения}
+	\end{figure}
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=14cm]{v}
+		
+		\caption{Зависимость коэффициента Пуассона $v$ изотропного композита от объемной доли включения}
+	\end{figure}
+\end{enumerate}
+
+\newpage
+\section{Заключение}
+В данной работе проведены сравнения двух методов: Mori-Tanaka и Self-consistent. Оба метода совпадают при малой доле армирования ($\cfrac{V}{V_0}<0.05$) и в крайних значениях, при большой доле методы сильно различаются (до 3-4 раз модуль упругости и до 1.2-1.28 раз коэффициент Пуассона). 
+
+Проведены расчеты для основных характеристик в случае трансверсально-изотропных включений.
+
+Рассмотрены случаи эллипсоидных включений с разными соотношениями осей. Для них результаты программ Wolfram Mathematica и Digimat совпали.
+
+
+\newpage
+
+\begin{thebibliography}{4}
+	\bibitem{Aboudi} Aboudi J. Arnold S.M. Bednarcyk B.A. - Micromechanics of Composite Materials - 1011 с. 
+	\bibitem{Chat}Chatzigeorgiou G. Meraghni F. Charalambakis N. - Multiscale Modeling Approaches for Composites - 344 c.
+\end{thebibliography}
+
+
+\end{document}
